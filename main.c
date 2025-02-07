@@ -52,11 +52,11 @@ void verificacao_arquivo(FILE *nome_arquivo){
 void criar_arquivo_palavras(void){
 
 	Palavras dados_palavras[] = {
-        {"Comida", 2, {"MACARR√O", "CENOURA"}},
-        {"Animal", 3, {"BALEIA", "RINOCERONTE", "TAMANDU¡"}},
+        {"Comida", 2, {"MACARR√ÉO", "CENOURA"}},
+        {"Animal", 3, {"BALEIA", "RINOCERONTE", "TAMANDU√Å"}},
         {"Roupa", 3, {"JAQUETA", "MOLETOM", "BERMUDA"}},
         {"Objeto", 1, {"TESOURA"}},
-        {"Cor", 2, {"AMARELO", "LIL¡S"}}
+        {"Cor", 2, {"AMARELO", "LIL√ÅS"}}
 	};
 
 	// abrir arquivo
@@ -121,7 +121,7 @@ void consultar_arquivo_premios(void){
 	fread(&dados_premios,sizeof(Premios), 1, arq);
 	fclose(arq);
 
-	printf("======= VALORES DOS PR MIOS =======\n");
+	printf("======= VALORES DOS PR√äMIOS =======\n");
 	printf("VALORES (R$)\n");
 	printf("===================================\n");
     for(i = 0; i < 11; i++){
@@ -146,7 +146,7 @@ void sorteio(int limite_palavras){
 	// sorteio da pista
 	int numero_sorteado = rand() % limite_palavras;
 	printf("\t\t\t\t\t");
-	printf("A palavra est· associada com: %s\n",dados_palavras[numero_sorteado].pista);
+	printf("A palavra est√° associada com: %s\n",dados_palavras[numero_sorteado].pista);
 	
 	// sorteio da palavra
 	int limite_qtd_palavras = dados_palavras[numero_sorteado].qtd;
@@ -189,11 +189,11 @@ void premio_rodada(int limite_premios){
 	switch(numero_sorteado){
 		case 0:
 			printf("PASSA A VEZ\n");
-			printf("A vez ser· passada para o prÛximo jogador.");
+			printf("A vez ser√° passada para o pr√≥ximo jogador.");
 			break;
 		case 1:
 			printf("PERDEU TUDO\n");
-			printf("A vez ser· passada para o prÛximo jogador.");
+			printf("A vez ser√° passada para o pr√≥ximo jogador.");
 			break;
 		default:			
 			printf("Escolha uma letra valendo R$%.2f:\n",premio_sorteado);
@@ -208,22 +208,24 @@ int main(void){
 	srand(time(NULL));
 	
 	// tela inicial do jogo
-	sorteio(5);
+	sorteio(5); // sorteio das pistas e palavras
 	printf("\n\n");
-	
+
+	// imprimir nome dos jogadores na tela
 	printf("\t\t\t\t");
 	for (i=0; i<3; i++){
 		printf("%-20s",jogadores[i].nome);
 	}
 	printf("\n");
-	
+
+	// imprimir o saldo dos jogadores na tela
 	printf("\t\t\t\t");
 	for (i=0; i<3; i++){
 		printf(" %-20.2f",jogadores[i].saldo);
 	}
 	
 	printf("\n\n");
-	premio_rodada(11);
+	premio_rodada(11); // sorteio do premio da rodada
 
 	return 0;
 }
