@@ -4,21 +4,21 @@
 #include <locale.h>
 #include <time.h>
 #include <string.h>
-
+#include <conio.h>
 
 /* variaveis globais */
 
 // criacao do tipo 'Palavras' para armazenar pista, quantidade de palavras e palavras
 typedef struct{
-	char pista[7+1];
+	char pista[8+1];
 	int qtd;
 	char vetpalavras[5][11+1]; // palavras ligadas a pista
 } Palavras;
+char palavra_sorteada[11+1], letra, letras_adivinhadas[11+1];
 
-// criacao do tipo 'Premios' para armazenar pista, quantidade de palavras e palavras
-typedef struct{
-	float valor[11];
-} Premios;
+// definição dos premios
+float dados_premios[11] = {0.00, 0.01, 100.00, 250.00, 500.00,
+750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
 
 // criacao e definicao do tipo 'Jogador'
 typedef struct{
@@ -38,6 +38,31 @@ int i,j;
 
 /* funcoes */
 
+// funcao para imprimir informacoes dos jogadores
+void info_jogadores(){
+	
+	// imprimir nome dos jogadores na tela
+	printf("\t\t\t\t");
+	for (i = 0; i < 3; i++){
+		printf("%-20s",jogadores[i].nome);
+	}
+	printf("\n");
+	
+    printf(" \t\t\t  ");
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 20; j++) {  // 20 = largura de cada nome
+            printf("=");
+        }
+    }
+
+	// imprimir o saldo dos jogadores na tela
+	printf("\n");
+	printf("  \t\t\t\t");
+	for (i = 0; i < 3; i++){
+		printf(" %-20.2f",jogadores[i].saldo);
+	}	
+}
+
 // funcao para verificar possibilidade de abrir arquivo
 void verificacao_arquivo(FILE *nome_arquivo){
 	
@@ -52,11 +77,11 @@ void verificacao_arquivo(FILE *nome_arquivo){
 void criar_arquivo_palavras(void){
 
 	Palavras dados_palavras[] = {
-        {"Comida", 2, {"MACARRÃƒO", "CENOURA"}},
-        {"Animal", 3, {"BALEIA", "RINOCERONTE", "TAMANDUÃ"}},
+        {"Alimento", 2, {"JABUTICABA", "CENOURA"}},
+        {"Animal", 3, {"BALEIA", "RINOCERONTE", "GOLFINHO"}},
         {"Roupa", 3, {"JAQUETA", "MOLETOM", "BERMUDA"}},
         {"Objeto", 1, {"TESOURA"}},
-        {"Cor", 2, {"AMARELO", "LILÃS"}}
+        {"Cor", 2, {"AMARELO", "TURQUESA"}}
 	};
 
 	// abrir arquivo
@@ -102,40 +127,68 @@ void consultar_arquivo_palavras(void){
 // funcao para criar arquivo 'PREMIOS.DAT' e armazenar os valores dos premios
 void criar_arquivo_premios(void){
 
-	Premios dados_premios = {0.00, 0.01, 100.00, 250.00, 500.00, 750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
-
 	arq = fopen("assets/PREMIOS.DAT", "w+b");
 	verificacao_arquivo(arq);
-	fwrite(&dados_premios,sizeof(Premios), 1, arq);
+	fwrite(&dados_premios,sizeof(float), 1, arq);
 
 	fclose(arq);
 }
 
 // funcao para consultar o conteudo de 'PREMIOS.DAT'
 void consultar_arquivo_premios(void){
-	Premios dados_premios[1];
+	float dados_premios[0];
 
 	arq = fopen("assets/PREMIOS.DAT", "r+b");
 	verificacao_arquivo(arq);
 
-	fread(&dados_premios,sizeof(Premios), 1, arq);
+	fread(&dados_premios,sizeof(float), 1, arq);
 	fclose(arq);
 
-	printf("======= VALORES DOS PRÃŠMIOS =======\n");
+	printf("======= VALORES DOS PRÊMIOS =======\n");
 	printf("VALORES (R$)\n");
 	printf("===================================\n");
     for(i = 0; i < 11; i++){
-        printf("%.2f\n",dados_premios[0].valor[i]);
+        printf("%.2f\n",dados_premios[i]);
     }
 
 	printf("\n\n\n");
 }
 
+// funcao para adivinhar letras que estao na palavra sorteada
+void adivinhar_palavra(char letra_escolhida) {
+	
+	int qtd_letra_encontrada = 0;
+	
+    printf("\t\t\t\t\t\t");
+
+    // verificacao se a letra esta presente na palavra sorteada
+    for (i = 0; i < strlen(palavra_sorteada); i++) {
+        if (letra_escolhida == palavra_sorteada[i]) {
+            letras_adivinhadas[i] = letra_escolhida; // adicionar letra que pertence a palavra ao vetor
+            qtd_letra_encontrada++;
+        }
+    }
+
+    // imprimir array com letras adivinhadas
+    for (i = 0; i < strlen(palavra_sorteada); i++) {
+        if (letras_adivinhadas[i] == '\0') {
+            printf(" _ ");
+        } else {
+            printf(" %c ", letras_adivinhadas[i]);
+        }
+    }
+    printf("\n");
+    
+    // mensagem caso a letra nao seja encontrada
+    if (qtd_letra_encontrada == 0) {
+        printf("\nNão existe '%c' na palavra.\n", letra_escolhida);
+    }
+
+}
 
 // funcao para realizar o sorteio da pista e da palavra
-void sorteio(int limite_palavras){
+void sorteio_palavra(int limite_palavras){
 	Palavras dados_palavras[5];
-	char palavra_sorteada[11+1];
 
 	// abrir arquivo contendo as palavras armazenadas
 	arq = fopen("assets/PALAVRAS.DAT", "r+b");
@@ -146,57 +199,70 @@ void sorteio(int limite_palavras){
 	// sorteio da pista
 	int numero_sorteado = rand() % limite_palavras;
 	printf("\t\t\t\t\t");
-	printf("A palavra estÃ¡ associada com: %s\n",dados_palavras[numero_sorteado].pista);
+	printf("A palavra está associada com: %s\n",dados_palavras[numero_sorteado].pista);
 	
 	// sorteio da palavra
 	int limite_qtd_palavras = dados_palavras[numero_sorteado].qtd;
 	int numero_palavra_sorteada = rand() % limite_qtd_palavras;
 	strcpy(palavra_sorteada, dados_palavras[numero_sorteado].vetpalavras[numero_palavra_sorteada]);
 	printf("\t\t\t\t\t");
-	printf(" A palavra sorteada foi: %s\n",palavra_sorteada);
+	printf(" A palavra sorteada foi: %s\n\n\n",palavra_sorteada);
 	
-	// omissao da palavra sorteada
-	printf("\n\n\t");
-	int tamanho_palavra_sorteada = strlen(palavra_sorteada);
-	for (i = 0; i < tamanho_palavra_sorteada; i++){
-		printf("_  ");	
+	// inicializar o array de letras adivinhadas com '\0'
+    memset(letras_adivinhadas, '\0', sizeof(letras_adivinhadas));
+	
+}
+
+// funcao para digitar uma letra
+void digitar_letra(){
+	
+	fflush(stdin); letra = getch();
+	while (!isalpha(letra)){
+		printf("\n\nEscolha uma LETRA: ");
+		fflush(stdin); letra = getch();
 	}
 	
+	// transformar e imprimir na tela letra digitada em maiusculo
+	letra = toupper(letra);
+	printf("%c\n",letra);
+	adivinhar_palavra(letra);
 	
 }
 
 // funcao para definir o premio da rodada
-void premio_rodada(int limite_premios){
-	Premios dados_premios;
+void sorteio_premio(int limite_premios){
 
 	// abrir arquivo contendo os valores dos premios armazenados
 	arq = fopen("assets/PREMIOS.DAT", "r+b");
 	verificacao_arquivo(arq);
-	fread(&dados_premios,sizeof(Premios),1,arq);
+	fread(&dados_premios,sizeof(float),1,arq);
 	fclose(arq);
 
 	// sorteio do premio
 	int numero_sorteado = rand() % limite_premios;
 	printf("Roda a roda!\n\n");
-	for (i = 1; i <= 5; i++){
+	/* for (i = 1; i <= 5; i++){
 		sleep(1);
 		printf(". ");
-	}
+	} */
 	printf("\n\n");
 	
 	// aplicacao da regra do premio (R$0.00 = passa a vez | R$0.01 = perde tudo)
-	float premio_sorteado = dados_premios.valor[numero_sorteado];
+	float premio_sorteado = dados_premios[numero_sorteado];
 	switch(numero_sorteado){
 		case 0:
 			printf("PASSA A VEZ\n");
-			printf("A vez serÃ¡ passada para o prÃ³ximo jogador.");
+			printf("A vez será passada para o próximo jogador.");
 			break;
 		case 1:
 			printf("PERDEU TUDO\n");
-			printf("A vez serÃ¡ passada para o prÃ³ximo jogador.");
-			break;
-		default:			
-			printf("Escolha uma letra valendo R$%.2f:\n",premio_sorteado);
+			printf("A vez será passada para o próximo jogador.");
+			break;		
+	}
+	
+	while (strlen(letras_adivinhadas) < strlen(palavra_sorteada)){
+		printf("\nEscolha uma letra valendo R$%.2f: ",premio_sorteado);
+		digitar_letra();
 	}
 
 }
@@ -208,24 +274,13 @@ int main(void){
 	srand(time(NULL));
 	
 	// tela inicial do jogo
-	sorteio(5); // sorteio das pistas e palavras
+	sorteio_palavra(5); // sorteio das pistas e palavras
 	printf("\n\n");
 
-	// imprimir nome dos jogadores na tela
-	printf("\t\t\t\t");
-	for (i=0; i<3; i++){
-		printf("%-20s",jogadores[i].nome);
-	}
-	printf("\n");
-
-	// imprimir o saldo dos jogadores na tela
-	printf("\t\t\t\t");
-	for (i=0; i<3; i++){
-		printf(" %-20.2f",jogadores[i].saldo);
-	}
+	info_jogadores(); // informacoes dos jogadores
 	
 	printf("\n\n");
-	premio_rodada(11); // sorteio do premio da rodada
+	sorteio_premio(11); // sorteio do premio da rodada
 
 	return 0;
 }
