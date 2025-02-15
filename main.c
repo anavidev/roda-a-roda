@@ -13,6 +13,7 @@ typedef struct{
 	int qtd;
 	char vetpalavras[5][11+1]; // palavras ligadas a pista
 } Palavras;
+Palavras dados_palavras[5];
 
 char palavra_sorteada[11+1], letra, letras_adivinhadas[11+1], palavra[11+1];;
 
@@ -35,7 +36,7 @@ Jogador jogadores[] = {
 };
 
 FILE *arq;
-int i,j, numero_sorteado, qtd_letra_encontrada = 0, jogador_atual = 0, tentativas_falhas = 0;;
+int i,j, numero_sorteado, qtd_letra_encontrada = 0, jogador_atual = 0, tentativas_falhas = 0;
 
 
 /* funcoes */
@@ -152,8 +153,6 @@ void consultar_arquivo_premios(void){
     for(i = 0; i < 11; i++){
         printf("%.2f\n",dados_premios[i]);
     }
-
-	printf("\n\n\n");
 }
 
 // funcao para adivinhar letras que estao na palavra sorteada
@@ -192,7 +191,6 @@ void adivinhar_palavra(char letra_escolhida) {
 
 // funcao para realizar o sorteio da pista e da palavra
 void sorteio_palavra(int limite_palavras){
-	Palavras dados_palavras[5];
 
 	// abrir arquivo contendo as palavras armazenadas
 	arq = fopen("assets/PALAVRAS.DAT", "r+b");
@@ -201,16 +199,12 @@ void sorteio_palavra(int limite_palavras){
 	fclose(arq);
 	
 	// sorteio da pista
-	int numero_sorteado = rand() % limite_palavras;
-	printf("\t\t\t\t\t");
-	printf("A palavra está associada com: %s\n",dados_palavras[numero_sorteado].pista);
+	numero_sorteado = rand() % limite_palavras;
 	
 	// sorteio da palavra
 	int limite_qtd_palavras = dados_palavras[numero_sorteado].qtd;
 	int numero_palavra_sorteada = rand() % limite_qtd_palavras;
 	strcpy(palavra_sorteada, dados_palavras[numero_sorteado].vetpalavras[numero_palavra_sorteada]);
-	printf("\t\t\t\t\t");
-	printf(" A palavra sorteada foi: %s\n\n\n",palavra_sorteada);
 	
 	// inicializar o array de letras adivinhadas com '\0'
     memset(letras_adivinhadas, '\0', sizeof(letras_adivinhadas));
@@ -227,7 +221,17 @@ void exibir_progresso_palavra(void) {
             printf(" %c ", letras_adivinhadas[i]);
         }
     }
-    printf("\n");
+    printf("\n\n");
+}
+
+void cabecalho(void){
+	
+	printf("\t\t\t\t\t");
+	printf("A palavra está associada com: %s\n",dados_palavras[numero_sorteado].pista);
+	printf("\t\t\t\t\t");
+	printf(" A palavra sorteada foi: %s\n\n\n",palavra_sorteada);
+	exibir_progresso_palavra();
+	
 }
 
 
@@ -268,12 +272,15 @@ void digitar_palavra(void){
 
     // verificar se a palavra digitada esta em dados_palavras
 	if (strcmp(palavra, palavra_sorteada) == 0) {
+		system("cls");
+		cabecalho();
+		info_jogadores();
     	printf("\n%s VENCEU!\n",jogadores[jogador_atual].nome);
     	jogadores[jogador_atual].saldo += premio_sorteado + jogadores[jogador_atual].saldo;
     	printf("\nFIM DE JOGO.");
     	exit(0);
 	} else {
-    	printf("ERRADO\n");
+    	printf("\nERRADO\n");
     	jogador_atual++;
     	tentativas_falhas++;
 	}
@@ -282,9 +289,8 @@ void digitar_palavra(void){
 	    printf("\n\nNINGUÉM ganhou o jogo.\n");
 	    printf("A palavra sorteada foi %s.\n", palavra_sorteada);
 	    exit(0);
-	} else{
-		return;
 	}
+	return;
 }
 
 // funcao para definir o premio da rodada
@@ -303,61 +309,61 @@ int sorteio_premio(int limite_premios){
 
 }
 
-void rodada(void){
-	int chance = 3;
-	
-	exibir_progresso_palavra();
 
-	while (strlen(letras_adivinhadas) < strlen(palavra_sorteada)){
-		printf("\n");
-		info_jogadores();
-		if (jogador_atual > 2){
-			jogador_atual = 0;	
-		}
-		printf("\n\nVez do %s",jogadores[jogador_atual].nome);
-		printf("\n");
-		if (qtd_letra_encontrada < strlen(palavra_sorteada) - 3){
-			sorteio_premio(11); // sorteio do premio da rodada
-			// aplicacao da regra do premio (R$0.00 = passa a vez | R$0.01 = perde tudo)
-			premio_sorteado = dados_premios[numero_sorteado];
-			printf("\nRoda a Roda!\n");
-			/* for (i = 1; i <= 5; i++){
-				sleep(1);
-				printf(". ");
-			} */
-			switch(numero_sorteado){
-				case 0:
-					printf("\nPASSA A VEZ\n");
-					printf("A vez será passada para o próximo jogador.\n");
-					jogador_atual++;
-					exibir_progresso_palavra();
-					break;
-				case 1:
-					printf("\nPERDEU TUDO\n");
-					printf("A vez será passada para o próximo jogador.\n");
-					jogadores[jogador_atual].saldo = 0.00;
-					jogador_atual++;
-					exibir_progresso_palavra();
-					break;
-				default:
-					sorteio_premio(11); // sorteio do premio da rodada
-					printf("\nEscolha uma letra valendo R$%.2f: ",premio_sorteado);
-					digitar_letra();
-					jogador_atual++;
-			}
-			
-		} else{
-			printf("\n\nFaltam menos de 4 letras para completar a palavra.\n");
-			printf("Você tem 5 segundos para pensar e depois digitar a palavra.\n");
-			/* for (i = 1; i <= 5; i++){
-				sleep(1);
-				printf(". ");
-			} */
-			sorteio_premio(11); // sorteio do premio da rodada
-			printf("\nEscolha uma palavra valendo R$%.2f: ",premio_sorteado + jogadores[jogador_atual].saldo);
-			digitar_palavra();		
-		}
-	}	
+void rodada(void) {
+    system("cls");
+    cabecalho();
+    int chance = 3;
+
+    while (strlen(letras_adivinhadas) < strlen(palavra_sorteada)) {
+        printf("\n");
+        info_jogadores();
+        if (jogador_atual > 2) {
+            jogador_atual = 0;
+        }
+        printf("\n\nVez do %s", jogadores[jogador_atual].nome);
+        printf("\n");
+        if (qtd_letra_encontrada < strlen(palavra_sorteada) - 3) {
+            sorteio_premio(11); // sorteio do premio da rodada
+            // aplicacão da regra do prêmio (R$0.00 = passa a vez | R$0.01 = perde tudo)
+            premio_sorteado = dados_premios[numero_sorteado];
+            printf("\nRoda a Roda!\n");
+            switch (numero_sorteado) {
+                case 0:
+                    printf("PASSA A VEZ\n");
+                    printf("A vez será passada para o próximo jogador.\n");
+                    jogador_atual++;
+                    exibir_progresso_palavra();
+                    system("cls");
+                    cabecalho();
+                    break;
+                case 1:
+                    printf("PERDEU TUDO\n");
+                    printf("A vez será passada para o próximo jogador.\n");
+                    jogadores[jogador_atual].saldo = 0.00;
+                    jogador_atual++;
+                    exibir_progresso_palavra();
+                    system("cls");
+                    cabecalho();
+                    break;
+                default:
+                    sorteio_premio(11);
+                    printf("Escolha uma letra valendo R$%.2f: ", premio_sorteado);
+                    digitar_letra();
+                    jogador_atual++;
+                    system("cls");
+                    cabecalho();
+            }
+        } else {
+            printf("Faltam menos de 4 letras para completar a palavra.\n");
+            printf("Você tem 5 segundos para pensar e depois digitar a palavra.\n");
+            sorteio_premio(11);
+            printf("Escolha uma palavra valendo R$%.2f: ", premio_sorteado + jogadores[jogador_atual].saldo);
+            digitar_palavra();
+            system("cls");
+            cabecalho();
+        }
+    }
 }
 
 int main(void){
@@ -367,9 +373,6 @@ int main(void){
 	
 	// tela inicial do jogo
 	sorteio_palavra(5); // sorteio das pistas e palavras
-	printf("\n\n");
-	
-	printf("\n\n");
 	rodada();
 
 	return 0;
