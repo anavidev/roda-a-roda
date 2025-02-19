@@ -3,7 +3,6 @@
 /* bibliotecas */
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
 
 
 /* definicao tipos de dados */
@@ -13,17 +12,6 @@ typedef struct{
 	int qtd;
 	char vetpalavras[5][11+1]; // palavras ligadas a pista
 } Palavras;
-
-
-/* variaveis globais */
-
-Palavras dados_palavras[5];
-
-float dados_premios[11] = {0.00, 0.01, 100.00, 250.00, 500.00,
-750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
-
-FILE *arq;
-int i,j;
 
 
 /* funcoes */
@@ -40,6 +28,7 @@ void verificacao_arquivo(FILE *nome_arquivo){
 
 // funcao para criar arquivo 'PALAVRAS.DAT' e armazenar as pistas
 void criar_arquivo_palavras(void){
+	FILE *arq;
 
 	Palavras dados_palavras[] = {
         {"Alimento", 2, {"JABUTICABA", "CENOURA"}},
@@ -58,6 +47,9 @@ void criar_arquivo_palavras(void){
 
 // funcao para consultar o conteudo de 'PALAVRAS.DAT'
 void consultar_arquivo_palavras(void){
+	Palavras dados_palavras[5];
+	FILE *arq;
+	int i,j;
 
 	arq = fopen("assets/PALAVRAS.DAT", "r+b");
 	verificacao_arquivo(arq);
@@ -84,6 +76,8 @@ void consultar_arquivo_palavras(void){
 
 // funcao para criar arquivo 'PREMIOS.DAT' e armazenar os valores dos premios
 void criar_arquivo_premios(void){
+	float dados_premios[11] = {0.00, 0.01, 100.00, 250.00, 500.00, 750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
+	FILE *arq;
 
 	arq = fopen("assets/PREMIOS.DAT", "w+b");
 	verificacao_arquivo(arq);
@@ -95,6 +89,8 @@ void criar_arquivo_premios(void){
 // funcao para consultar o conteudo de 'PREMIOS.DAT'
 void consultar_arquivo_premios(void){
 	float dados_premios[0];
+	FILE *arq;
+	int i;
 
 	arq = fopen("assets/PREMIOS.DAT", "r+b");
 	verificacao_arquivo(arq);
