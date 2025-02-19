@@ -1,6 +1,7 @@
 // programa para rodar o jogo
 
 /* bibliotecas */
+#include <locale.h>
 #include "rodada.c"
 
 /* corpo do programa */
