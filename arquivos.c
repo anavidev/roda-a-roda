@@ -13,6 +13,8 @@ typedef struct{
 	char vetpalavras[5][11+1]; // palavras ligadas a pista
 } Palavras;
 
+/* variaveis globais */
+Palavras dados_palavras[5];
 
 /* funcoes */
 
@@ -47,7 +49,6 @@ void criar_arquivo_palavras(void){
 
 // funcao para consultar o conteudo de 'PALAVRAS.DAT'
 void consultar_arquivo_palavras(void){
-	Palavras dados_palavras[5];
 	FILE *arq;
 	int i,j;
 

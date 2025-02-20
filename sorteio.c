@@ -7,7 +7,7 @@
 
 /* variaveis globais */
 char palavra_sorteada[11+1], letras_adivinhadas[11+1];
-int numero_sorteado;
+int numero_palavra_sorteada, numero_premio_sorteado, palavra_escolhida;
 float premio_sorteado;
 
 
@@ -15,7 +15,6 @@ float premio_sorteado;
 
 // funcao para realizar o sorteio da pista e da palavra
 void sorteio_palavra(int limite_palavras){
-	Palavras dados_palavras[5];
 	FILE *arq;
 
 	// abrir arquivo contendo as palavras armazenadas
@@ -25,12 +24,12 @@ void sorteio_palavra(int limite_palavras){
 	fclose(arq);
 	
 	// sorteio da pista
-	numero_sorteado = rand() % limite_palavras;
+	numero_palavra_sorteada = rand() % limite_palavras;
 	
 	// sorteio da palavra
-	int limite_qtd_palavras = dados_palavras[numero_sorteado].qtd;
-	int numero_palavra_sorteada = rand() % limite_qtd_palavras;
-	strcpy(palavra_sorteada, dados_palavras[numero_sorteado].vetpalavras[numero_palavra_sorteada]);
+	int limite_qtd_palavras = dados_palavras[numero_palavra_sorteada].qtd;
+	palavra_escolhida = rand() % limite_qtd_palavras;
+	strcpy(palavra_sorteada, dados_palavras[numero_palavra_sorteada].vetpalavras[palavra_escolhida]);
 	
 	// inicializar o array de letras adivinhadas com '\0'
     memset(letras_adivinhadas, '\0', sizeof(letras_adivinhadas));
@@ -41,7 +40,7 @@ void sorteio_palavra(int limite_palavras){
 int sorteio_premio(int limite_premios){
 	float dados_premios[11] = {0.00, 0.01, 100.00, 250.00, 500.00, 750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
 	FILE *arq;
-
+		
 	// abrir arquivo contendo os valores dos premios armazenados
 	arq = fopen("assets/PREMIOS.DAT", "r+b");
 	verificacao_arquivo(arq);
@@ -49,9 +48,9 @@ int sorteio_premio(int limite_premios){
 	fclose(arq);
 
 	// sorteio do premio
-	numero_sorteado = rand() % limite_premios;
+	numero_premio_sorteado = rand() % limite_premios;
 	
-	return numero_sorteado;
+	return numero_premio_sorteado;
 
 }
 
