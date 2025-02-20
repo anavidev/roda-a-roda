@@ -54,6 +54,31 @@ void info_jogadores(void){
 	}	
 }
 
+// funcao para mostrar sublinhados ou letras a cada rodada
+void exibir_progresso_palavra(void) {
+	int i;
+	
+    printf("\t\t\t\t\t\t");
+    for (i = 0; i < strlen(palavra_sorteada); i++) {
+        if (letras_adivinhadas[i] == '\0') {
+            printf(" _ ");
+        } else {
+            printf(" %c ", letras_adivinhadas[i]);
+        }
+    }
+    printf("\n\n\n\n");
+}
+
+// funcao para imprimir a pista e a palavra a ser adivinhada
+void cabecalho(void){
+	
+	printf("\t\t\t\t\t");
+	printf("A palavra está associada com: %s\n",dados_palavras[numero_palavra_sorteada].pista);
+	printf("\t\t\t\t\t");
+	printf(" A palavra sorteada foi: %s\n\n\n",palavra_sorteada);
+	
+}
+
 // funcao para adivinhar letras que estao na palavra sorteada
 void adivinhar_palavra(char letra_escolhida) {
 	int i, qtd_letra_rodada = 0;
@@ -88,39 +113,12 @@ void adivinhar_palavra(char letra_escolhida) {
 
 }
 
-// funcao para mostrar sublinhados ou letras a cada rodada
-void exibir_progresso_palavra(void) {
-	int i;
-	
-    printf("\t\t\t\t\t\t");
-    for (i = 0; i < strlen(palavra_sorteada); i++) {
-        if (letras_adivinhadas[i] == '\0') {
-            printf(" _ ");
-        } else {
-            printf(" %c ", letras_adivinhadas[i]);
-        }
-    }
-    printf("\n\n");
-}
-
-// funcao para imprimir a pista e a palavra a ser adivinhada
-void cabecalho(void){
-	Palavras dados_palavras[5];
-	
-	printf("\t\t\t\t\t");
-	printf("A palavra está associada com: %s\n",dados_palavras[numero_sorteado].pista);
-	printf("\t\t\t\t\t");
-	printf(" A palavra sorteada foi: %s\n\n\n",palavra_sorteada);
-	exibir_progresso_palavra();
-	
-}
-
 // funcao para digitar uma letra
 void digitar_letra(void){
 	
 	fflush(stdin); letra = getch();
 	while (!isalpha(letra)){
-		printf("\n\nEscolha uma LETRA: ");
+		printf("\nEscolha uma LETRA: ");
 		fflush(stdin); letra = getch();
 	}
 	
@@ -141,7 +139,7 @@ void digitar_palavra(void){
     // verificar se todos os caracteres sao letras
     for (i = 0; i < strlen(palavra); i++) {
         while (!isalpha(palavra[i])) {
-            printf("\n\nEscreva apenas LETRAS: ");
+            printf("\nEscreva apenas LETRAS: ");
             fflush(stdin); scanf("%s",&palavra);
         }
     }	
@@ -154,15 +152,26 @@ void digitar_palavra(void){
     // verificar se a palavra digitada esta em dados_palavras
 	if (strcmp(palavra, palavra_sorteada) == 0) {
 		system("cls");
-		cabecalho();
-		info_jogadores();
+		jogadores[jogador_atual].saldo += premio_sorteado + jogadores[jogador_atual].saldo;
+    	cabecalho();
+    	printf("\n\t\t\t\t\t\t");
+    	for (i = 0; i < strlen(palavra_sorteada); i++){
+    		printf("%c  ",palavra_sorteada[i]);
+		}
+		printf("\n\n\n");
+    	info_jogadores();
     	printf("\n%s VENCEU!\n",jogadores[jogador_atual].nome);
-    	jogadores[jogador_atual].saldo += premio_sorteado + jogadores[jogador_atual].saldo;
+    	printf("\nPressione qualquer tecla para continuar.");
+    	getch();
     	printf("\nFIM DE JOGO.");
     	exit(0);
 	} else {
 		printf("\nERRADO.");
+		printf("\nPressione qualquer tecla para continuar.\n");
 		getch();
+		system("cls");
+		cabecalho();
+		exibir_progresso_palavra();
     	jogador_atual++;
     	tentativas_falhas++;
 	}
@@ -170,6 +179,9 @@ void digitar_palavra(void){
 	if (tentativas_falhas == 3) {
 	    printf("\n\nNINGUÉM ganhou o jogo.\n");
 	    printf("A palavra sorteada foi %s.\n", palavra_sorteada);
+	    printf("\nPressione qualquer tecla para continuar.");
+	    getch();
+	    printf("\nFIM DO JOGO.");
 	    exit(0);
 	}
 	return;
@@ -192,11 +204,12 @@ void rodada(void) {
 	
     system("cls");
     cabecalho();
+    exibir_progresso_palavra();
     int chance = 3;
 
     while (strlen(letras_adivinhadas) < strlen(palavra_sorteada)) {
+    	info_jogadores();
         printf("\n");
-        info_jogadores();
         if (jogador_atual > 2) {
             jogador_atual = 0;
         }
@@ -205,28 +218,32 @@ void rodada(void) {
         if (qtd_letra_encontrada < strlen(palavra_sorteada) - 3) {
             sorteio_premio(11); // sorteio do premio da rodada
             // aplicacão da regra do prêmio (R$0.00 = passa a vez | R$0.01 = perde tudo)
-            premio_sorteado = dados_premios[numero_sorteado];
+            premio_sorteado = dados_premios[numero_premio_sorteado];
             printf("\nRoda a Roda!\n");
             tempo_resposta();
-            switch (numero_sorteado) {
+            switch (numero_premio_sorteado) {
                 case 0:
                     printf("PASSA A VEZ\n");
                     printf("A vez será passada para o próximo jogador.\n");
+                    printf("\nPressione qualquer tecla para continuar.");
                     getch();
                     jogador_atual++;
                     exibir_progresso_palavra();
                     system("cls");
                     cabecalho();
+                    exibir_progresso_palavra();
                     break;
                 case 1:
                     printf("PERDEU TUDO\n");
                     printf("A vez será passada para o próximo jogador.\n");
+                    printf("\nPressione qualquer tecla para continuar.");
                     jogadores[jogador_atual].saldo = 0.00;
                     getch();
                     jogador_atual++;
                     exibir_progresso_palavra();
                     system("cls");
                     cabecalho();
+                    exibir_progresso_palavra();
                     break;
                 default:
                     sorteio_premio(11);
@@ -235,6 +252,7 @@ void rodada(void) {
                     jogador_atual++;
                     system("cls");
                     cabecalho();
+                    exibir_progresso_palavra();
             }
         } else {
             printf("\nFaltam menos de 4 letras para completar a palavra.\n");
@@ -243,8 +261,6 @@ void rodada(void) {
             sorteio_premio(11);
             printf("Escolha uma palavra valendo R$%.2f: ", premio_sorteado + jogadores[jogador_atual].saldo);
             digitar_palavra();
-            system("cls");
-            cabecalho();
         }
     }
 }
