@@ -76,33 +76,34 @@ void consultar_arquivo_palavras(void){
 }
 
 // funcao para criar arquivo 'PREMIOS.DAT' e armazenar os valores dos premios
-void criar_arquivo_premios(void){
-	float dados_premios[11] = {0.00, 0.01, 100.00, 250.00, 500.00, 750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
-	FILE *arq;
+void criar_arquivo_premios(void) {
+    float dados_premios[11] = {0.00, 0.01, 100.00, 250.00, 500.00, 750.00, 1000.00, 2500.00, 5000.00, 7500.00, 10000.00};
+    FILE *arq;
 
-	arq = fopen("assets/PREMIOS.DAT", "w+b");
-	verificacao_arquivo(arq);
-	fwrite(&dados_premios,sizeof(float), 1, arq);
+    arq = fopen("assets/PREMIOS.DAT", "w+b");
+    verificacao_arquivo(arq);
 
-	fclose(arq);
+    fwrite(dados_premios, sizeof(float), 11, arq);
+
+    fclose(arq);
 }
 
 // funcao para consultar o conteudo de 'PREMIOS.DAT'
-void consultar_arquivo_premios(void){
-	float dados_premios[0];
-	FILE *arq;
-	int i;
+void consultar_arquivo_premios(void) {
+    float dados_premios[11]; // Array com tamanho correto
+    FILE *arq;
+    int i;
 
-	arq = fopen("assets/PREMIOS.DAT", "r+b");
-	verificacao_arquivo(arq);
+    arq = fopen("assets/PREMIOS.DAT", "r+b");
+    verificacao_arquivo(arq);
 
-	fread(&dados_premios,sizeof(float), 1, arq);
-	fclose(arq);
+    fread(dados_premios, sizeof(float), 11, arq);
+    fclose(arq);
 
-	printf("======= VALORES DOS PRÊMIOS =======\n");
-	printf("VALORES (R$)\n");
-	printf("===================================\n");
-    for(i = 0; i < 11; i++){
-        printf("%.2f\n",dados_premios[i]);
+    printf("======= VALORES DOS PRÊMIOS =======\n");
+    printf("VALORES (R$)\n");
+    printf("===================================\n");
+    for (i = 0; i < 11; i++) {
+        printf("%.2f\n", dados_premios[i]);
     }
 }
